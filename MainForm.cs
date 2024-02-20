@@ -1,28 +1,34 @@
 ﻿using AuraServiceLib;
-using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace SleepingDevices {
     public partial class MainForm : Form {
-        private IAuraSdk2 sdk = (IAuraSdk2)new AuraSdk();
+        private readonly IAuraSdk2 sdk = (IAuraSdk2)new AuraSdk();
         [DllImport("user32.dll")]
         private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
         private Point? startPos = null;
 
         public MainForm() {
             GlobalMouseHandler gmh = new GlobalMouseHandler();
-            gmh.TheMouseMoved += new MouseMovedEvent(gmh_TheMouseMoved);
+            gmh.TheMouseMoved += new MouseMovedEvent(OnMouseMove);
             Application.AddMessageFilter(gmh);
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
+            InitializeComponent();
+            SetAuraOff();
+            Thread.Sleep(2000);
+            SetMonitorInState(MonitorState.MonitorStateOff);
+        }
+
+        private void OnApplicationExit(object sender, EventArgs e) {
+            // Console.WriteLine("Exit");
+            sdk.ReleaseControl(0);
+        }
+
+        private void SetAuraOff() {
             sdk.SwitchMode();
             var devices = sdk.Enumerate(0);
             foreach (IAuraSyncDevice dev in devices) {
@@ -31,17 +37,9 @@ namespace SleepingDevices {
                 }
                 dev.Apply();
             }
-
-            SetMonitorInState(MonitorState.MonitorStateOff);
-            InitializeComponent();
         }
 
-        private void OnApplicationExit(object sender, EventArgs e) {
-            Console.WriteLine("Exit");
-            sdk.ReleaseControl(0);
-        }
-
-        void gmh_TheMouseMoved() {
+        private void OnMouseMove() {
             Point cur_pos = Cursor.Position;
             // Console.WriteLine(startPos);
             // Console.WriteLine(cur_pos);
@@ -53,9 +51,6 @@ namespace SleepingDevices {
                 }
             }
 
-        }
-        void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e) {
-            SetMonitorInState(MonitorState.MonitorStateOff);
         }
 
         private void SetMonitorInState(MonitorState state) {
