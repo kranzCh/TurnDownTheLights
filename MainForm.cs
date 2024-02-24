@@ -13,6 +13,7 @@ namespace TurnDownTheLights {
         private Point? startPos = null;
 
         public MainForm() {
+            InitializeCursorPosition();
             GlobalMouseHandler gmh = new GlobalMouseHandler();
             gmh.TheMouseMoved += new MouseMovedEvent(OnMouseMove);
             Application.AddMessageFilter(gmh);
@@ -39,17 +40,17 @@ namespace TurnDownTheLights {
             }
         }
 
+        private void InitializeCursorPosition() {
+            Rectangle r = Screen.PrimaryScreen.Bounds;
+            Cursor.Position = new Point((r.Width / 2), (r.Height / 2));
+            startPos = Cursor.Position;
+            // Console.WriteLine(startPos);
+        }
+
         private void OnMouseMove() {
             Point cur_pos = Cursor.Position;
-            if (startPos == null) {
-                Rectangle r = Screen.PrimaryScreen.Bounds;
-                Cursor.Position = new Point((r.Width / 2), (r.Height / 2));
-                startPos = Cursor.Position;
-                Console.WriteLine(startPos);
-            } else {
-                if (startPos != cur_pos) {
-                    Application.Exit();
-                }
+            if (startPos != cur_pos) {
+                Application.Exit();
             }
             // Console.WriteLine(cur_pos);
         }
