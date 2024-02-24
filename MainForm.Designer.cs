@@ -1,4 +1,4 @@
-﻿namespace SleepingDevices {
+﻿namespace TurnDownTheLights {
     partial class MainForm {
         /// <summary>
         /// Required designer variable.

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepingDevices", "SleepingDevices.csproj", "{20C0C7CA-B387-42D8-845C-D3568E3EEBC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurnDownTheLights", "TurnDownTheLights.csproj", "{20C0C7CA-B387-42D8-845C-D3568E3EEBC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

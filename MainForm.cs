@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace SleepingDevices {
+namespace TurnDownTheLights {
     public partial class MainForm : Form {
         private readonly IAuraSdk2 sdk = (IAuraSdk2)new AuraSdk();
         [DllImport("user32.dll")]
@@ -19,7 +19,7 @@ namespace SleepingDevices {
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
             InitializeComponent();
             SetAuraOff();
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
             SetMonitorInState(MonitorState.MonitorStateOff);
         }
 
@@ -41,16 +41,17 @@ namespace SleepingDevices {
 
         private void OnMouseMove() {
             Point cur_pos = Cursor.Position;
-            // Console.WriteLine(startPos);
-            // Console.WriteLine(cur_pos);
             if (startPos == null) {
-                startPos = cur_pos;
+                Rectangle r = Screen.PrimaryScreen.Bounds;
+                Cursor.Position = new Point((r.Width / 2), (r.Height / 2));
+                startPos = Cursor.Position;
+                Console.WriteLine(startPos);
             } else {
                 if (startPos != cur_pos) {
                     Application.Exit();
                 }
             }
-
+            // Console.WriteLine(cur_pos);
         }
 
         private void SetMonitorInState(MonitorState state) {
