@@ -35,7 +35,7 @@
             this.ControlBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Sleeping";
+            this.Text = "TurnDownTheLights";
             this.TopMost = true;
             this.ResumeLayout(false);
 
