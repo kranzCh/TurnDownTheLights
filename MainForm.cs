@@ -13,6 +13,7 @@ namespace TurnDownTheLights {
         private Point? startPos = null;
 
         public MainForm() {
+            Thread.Sleep(1000);
             InitializeCursorPosition();
             GlobalMouseHandler gmh = new GlobalMouseHandler();
             gmh.TheMouseMoved += new MouseMovedEvent(OnMouseMove);
@@ -20,7 +21,6 @@ namespace TurnDownTheLights {
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
             InitializeComponent();
             SetAuraOff();
-            Thread.Sleep(1000);
             SetMonitorInState(MonitorState.MonitorStateOff);
         }
 
