@@ -15,9 +15,9 @@ namespace TurnDownTheLights {
         public MainForm() {
             Thread.Sleep(1000);
             InitializeCursorPosition();
-            GlobalMouseHandler gmh = new GlobalMouseHandler();
-            gmh.TheMouseMoved += new MouseMovedEvent(OnMouseMove);
-            Application.AddMessageFilter(gmh);
+            //GlobalMouseHandler gmh = new GlobalMouseHandler();
+            //gmh.TheMouseMoved += new MouseMovedEvent(OnMouseMove);
+            //Application.AddMessageFilter(gmh);
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
             InitializeComponent();
             SetAuraOff();
@@ -47,12 +47,13 @@ namespace TurnDownTheLights {
             // Console.WriteLine(startPos);
         }
 
-        private void OnMouseMove() {
-            Point cur_pos = Cursor.Position;
-            if (startPos != cur_pos) {
-                Application.Exit();
-            }
-            // Console.WriteLine(cur_pos);
+        private void OnMouseClick(Object sender, EventArgs e) {
+            Application.Exit();
+        }
+
+        private void OnMouseMove(Object sender, MouseEventArgs e) {
+            SetMonitorInState(MonitorState.MonitorStateOff);
+            Console.WriteLine("Moved.");
         }
 
         private void SetMonitorInState(MonitorState state) {
