@@ -15,9 +15,6 @@ namespace TurnDownTheLights {
         public MainForm() {
             Thread.Sleep(1000);
             InitializeCursorPosition();
-            //GlobalMouseHandler gmh = new GlobalMouseHandler();
-            //gmh.TheMouseMoved += new MouseMovedEvent(OnMouseMove);
-            //Application.AddMessageFilter(gmh);
             Application.ApplicationExit += new EventHandler(OnApplicationExit);
             InitializeComponent();
             SetAuraOff();
@@ -36,6 +33,7 @@ namespace TurnDownTheLights {
                 foreach (IAuraRgbLight light in dev.Lights) {
                     light.Color = 0;
                 }
+                Console.WriteLine($"{dev.Name}: Applied");
                 dev.Apply();
             }
         }
@@ -53,7 +51,7 @@ namespace TurnDownTheLights {
 
         private void OnMouseMove(Object sender, MouseEventArgs e) {
             SetMonitorInState(MonitorState.MonitorStateOff);
-            Console.WriteLine("Moved.");
+            //Console.WriteLine("Moved.");
         }
 
         private void SetMonitorInState(MonitorState state) {
@@ -61,27 +59,6 @@ namespace TurnDownTheLights {
         }
     }
 
-    public delegate void MouseMovedEvent();
-
-    public class GlobalMouseHandler : IMessageFilter {
-        private const int WM_MOUSEMOVE = 0x0200;
-
-        public event MouseMovedEvent TheMouseMoved;
-
-        #region IMessageFilter Members
-
-        public bool PreFilterMessage(ref Message m) {
-            if (m.Msg == WM_MOUSEMOVE) {
-                if (TheMouseMoved != null) {
-                    TheMouseMoved();
-                }
-            }
-            // Always allow message to continue to the next filter control
-            return false;
-        }
-
-        #endregion
-    }
     public enum MonitorState {
         MonitorStateOn = -1,
         MonitorStateOff = 2,
