@@ -37,8 +37,8 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "TurnDownTheLights";
             this.TopMost = true;
-            this.Click += new System.EventHandler(this.OnMouseClick);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnMouseMove);
+            // this.Click += new System.EventHandler(this.OnMouseClick); // Removed
+            // this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnMouseMove); // Removed
             this.ResumeLayout(false);
 
         }
