@@ -225,15 +225,16 @@ namespace TurnDownTheLights {
             // Ensure the settings form is not parented to the main form if main form is invisible,
             // otherwise the dialog might also be invisible or behave strangely.
             // ShowDialog() without a parent is generally safer for tray apps.
+            UnregisterHotKeys();
             using (var settingsForm = new SettingsForm(AppSettings.TurnOffHotKey, AppSettings.ExitHotKey)) {
-                if (settingsForm.ShowDialog() == DialogResult.OK) { // Removed 'this'
+                if (settingsForm.ShowDialog() == DialogResult.OK) {
                     AppSettings.TurnOffHotKey = settingsForm.TurnOffHotKey;
                     AppSettings.ExitHotKey = settingsForm.ExitHotKey;
                     AppSettings.Save();
-                    RegisterHotKeys(); // Re-register hotkeys immediately after saving
                     MessageBox.Show("Settings saved. Hotkeys are now active.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+            RegisterHotKeys();
         }
 
         private void OnApplicationExit(object sender, EventArgs e) {
