@@ -1,15 +1,12 @@
-﻿using AuraServiceLib;
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using System; // Added for EventArgs
+ // Added for EventArgs
 
 namespace TurnDownTheLights {
     public partial class MainForm : Form {
-        private readonly IAuraSdk2 sdk = (IAuraSdk2)new AuraSdk();
-
         // Hotkey P/Invokes and constants
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
@@ -46,7 +43,6 @@ namespace TurnDownTheLights {
             // AppSettings now handles its own initialization (loading settings or defaults) in its static constructor.
             // No explicit call to UpgradeSettingsIfRequired or SetDefaultsIfEmpty is needed here.
 
-            Thread.Sleep(1000); // This might be Aura SDK related, leaving it for now
             InitializeCursorPosition();
             Application.ApplicationExit += new EventHandler(OnApplicationExit); // For unregistering hotkeys
             this.Load += new EventHandler(MainForm_Load); // For registering hotkeys & setting up tray
@@ -180,7 +176,6 @@ namespace TurnDownTheLights {
         }
 
         private void TriggerTurnOffActions() {
-            SetAuraOff();
             SetMonitorInState(MonitorState.MonitorStateOff);
 
             // Make the form cover secondary screens
@@ -238,19 +233,6 @@ namespace TurnDownTheLights {
             }
 
             // Console.WriteLine("Exit");
-            sdk.ReleaseControl(0);
-        }
-
-        private void SetAuraOff() {
-            sdk.SwitchMode();
-            var devices = sdk.Enumerate(0);
-            foreach (IAuraSyncDevice dev in devices) {
-                foreach (IAuraRgbLight light in dev.Lights) {
-                    light.Color = 0;
-                }
-                Console.WriteLine($"{dev.Name}: Applied");
-                dev.Apply();
-            }
         }
 
         private void InitializeCursorPosition() {
