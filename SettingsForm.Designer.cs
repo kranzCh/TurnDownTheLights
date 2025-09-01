@@ -31,45 +31,45 @@ namespace TurnDownTheLights {
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblInstructions = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            //
+            // 
             // lblTurnOff
-            //
+            // 
             this.lblTurnOff.AutoSize = true;
             this.lblTurnOff.Location = new System.Drawing.Point(12, 35);
             this.lblTurnOff.Name = "lblTurnOff";
-            this.lblTurnOff.Size = new System.Drawing.Size(130, 13);
+            this.lblTurnOff.Size = new System.Drawing.Size(125, 13);
             this.lblTurnOff.TabIndex = 0;
             this.lblTurnOff.Text = "Turn Off Lights/Monitors:";
-            //
+            // 
             // txtTurnOffKey
-            //
+            // 
             this.txtTurnOffKey.Location = new System.Drawing.Point(148, 32);
             this.txtTurnOffKey.Name = "txtTurnOffKey";
             this.txtTurnOffKey.ReadOnly = true;
             this.txtTurnOffKey.Size = new System.Drawing.Size(124, 20);
             this.txtTurnOffKey.TabIndex = 1;
             this.txtTurnOffKey.Text = "None";
-            //
+            // 
             // lblExit
-            //
+            // 
             this.lblExit.AutoSize = true;
             this.lblExit.Location = new System.Drawing.Point(12, 65);
             this.lblExit.Name = "lblExit";
-            this.lblExit.Size = new System.Drawing.Size(85, 13);
+            this.lblExit.Size = new System.Drawing.Size(82, 13);
             this.lblExit.TabIndex = 2;
             this.lblExit.Text = "Exit Application:";
-            //
+            // 
             // txtExitKey
-            //
+            // 
             this.txtExitKey.Location = new System.Drawing.Point(148, 62);
             this.txtExitKey.Name = "txtExitKey";
             this.txtExitKey.ReadOnly = true;
             this.txtExitKey.Size = new System.Drawing.Size(124, 20);
             this.txtExitKey.TabIndex = 3;
             this.txtExitKey.Text = "None";
-            //
+            // 
             // btnSave
-            //
+            // 
             this.btnSave.Location = new System.Drawing.Point(116, 100);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
@@ -77,9 +77,9 @@ namespace TurnDownTheLights {
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            //
+            // 
             // btnCancel
-            //
+            // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Location = new System.Drawing.Point(197, 100);
             this.btnCancel.Name = "btnCancel";
@@ -88,18 +88,18 @@ namespace TurnDownTheLights {
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            //
+            // 
             // lblInstructions
-            //
+            // 
             this.lblInstructions.AutoSize = true;
             this.lblInstructions.Location = new System.Drawing.Point(12, 9);
             this.lblInstructions.Name = "lblInstructions";
-            this.lblInstructions.Size = new System.Drawing.Size(244, 13);
+            this.lblInstructions.Size = new System.Drawing.Size(238, 13);
             this.lblInstructions.TabIndex = 6;
             this.lblInstructions.Text = "Click in a box and press the desired shortcut key.";
-            //
+            // 
             // SettingsForm
-            //
+            // 
             this.AcceptButton = this.btnSave;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

@@ -8,6 +8,7 @@ namespace TurnDownTheLights {
 
         public SettingsForm(Keys currentTurnOffHotKey, Keys currentExitHotKey) {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
             TurnOffHotKey = currentTurnOffHotKey;
             ExitHotKey = currentExitHotKey;
 
@@ -44,7 +45,7 @@ namespace TurnDownTheLights {
                 MessageBox.Show("Shortcut keys must be different.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            this.DialogResult = DialogResult.OK;
+            //this.DialogResult = DialogResult.OK;
             this.Close();
         }
 

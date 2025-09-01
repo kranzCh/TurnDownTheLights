@@ -35,6 +35,7 @@ namespace TurnDownTheLights {
         [DllImport("user32.dll")]
         private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
         private Point? startPos = null;
+        private bool IsActivated = false; // Custom flag to indicate active blackout
 
         private NotifyIcon notifyIcon;
         private ContextMenuStrip trayContextMenu;
@@ -52,7 +53,6 @@ namespace TurnDownTheLights {
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             this.Visible = false; // Hide the form itself initially
-
             InitializeTrayIcon();
         }
 
@@ -75,15 +75,17 @@ namespace TurnDownTheLights {
             notifyIcon = new NotifyIcon();
             notifyIcon.ContextMenuStrip = trayContextMenu;
             notifyIcon.Text = "TurnDownTheLights";
-
             // Icon: Placeholder - ideally load from resources.
             // Using a system icon for now. This might not be ideal or might not work on all systems.
             // A proper .ico file should be added to the project resources.
             try {
                 // Attempt to use a generic system icon if available
-                System.Drawing.Icon sysIcon = SystemIcons.Application;
-                if (sysIcon != null) notifyIcon.Icon = sysIcon;
-                else notifyIcon.Icon = new Icon(SystemIcons.Application, 40, 40); // Fallback if direct assignment fails
+                System.Drawing.Icon sysIcon = new Icon("Resources/TurnDownTheLights.ico");
+                if (sysIcon != null) {
+                    notifyIcon.Icon = sysIcon;
+                } else {
+                    notifyIcon.Icon = new Icon(SystemIcons.Application, 40, 40); // Fallback if direct assignment fails
+                }
             } catch {
                 // If system icons fail, this will be an issue. A project resource is needed.
                 Console.WriteLine("Failed to load system icon. Please add an icon to project resources.");
@@ -171,9 +173,9 @@ namespace TurnDownTheLights {
                 if (id == turnOffHotKeyAtom) {
                     Console.WriteLine("Turn Off Hotkey Pressed!");
                     TriggerTurnOffActions();
-                } else if (id == exitHotKeyAtom) {
+                } else if (id == exitHotKeyAtom && this.IsActivated) {
                     Console.WriteLine("Exit Hotkey Pressed!");
-                    Application.Exit();
+                    TriggerTurnOnActions();
                 }
             }
         }
@@ -201,10 +203,19 @@ namespace TurnDownTheLights {
                     this.TopMost = true; // Ensure it's on top
                     this.Show(); // Show it if it was hidden
                     this.Activate(); // Try to bring to front
+                    this.IsActivated = true;
                 } else {
                     // If no secondary screens, maybe just hide the form or do nothing extra
                     // For now, if no secondary screens, this part does nothing to the form's visibility/size
                 }
+            });
+        }
+
+        private void TriggerTurnOnActions() {
+            SetMonitorInState(MonitorState.MonitorStateOn);
+            this.Invoke((MethodInvoker)delegate {
+                this.Hide(); // Hide the blackout form
+                this.IsActivated = false;
             });
         }
 
@@ -244,9 +255,6 @@ namespace TurnDownTheLights {
             startPos = Cursor.Position;
             // Console.WriteLine(startPos);
         }
-
-        // OnMouseClick is removed
-        // OnMouseMove is removed
 
         private void SetMonitorInState(MonitorState state) {
             SendMessage(0xFFFF, 0x112, 0xF170, (int)state);
