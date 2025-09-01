@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
- // Added for EventArgs
+// Added for EventArgs
 
 namespace TurnDownTheLights {
     public partial class MainForm : Form {
@@ -81,9 +81,9 @@ namespace TurnDownTheLights {
             // A proper .ico file should be added to the project resources.
             try {
                 // Attempt to use a generic system icon if available
-                 System.Drawing.Icon sysIcon = SystemIcons.Application;
-                 if (sysIcon != null) notifyIcon.Icon = sysIcon;
-                 else notifyIcon.Icon = new Icon(SystemIcons.Application, 40,40); // Fallback if direct assignment fails
+                System.Drawing.Icon sysIcon = SystemIcons.Application;
+                if (sysIcon != null) notifyIcon.Icon = sysIcon;
+                else notifyIcon.Icon = new Icon(SystemIcons.Application, 40, 40); // Fallback if direct assignment fails
             } catch {
                 // If system icons fail, this will be an issue. A project resource is needed.
                 Console.WriteLine("Failed to load system icon. Please add an icon to project resources.");
@@ -130,12 +130,15 @@ namespace TurnDownTheLights {
                 if (!RegisterHotKey(this.Handle, exitHotKeyAtom, modifiers, vk)) {
                     Console.WriteLine($"Failed to register Exit hotkey. Error code: {Marshal.GetLastWin32Error()}");
                 } else {
-                     Console.WriteLine($"Exit Hotkey registered: {exitKey}");
+                    Console.WriteLine($"Exit Hotkey registered: {exitKey}");
                 }
             }
         }
 
         private void UnregisterHotKeys() {
+            if (this.IsDisposed || !this.IsHandleCreated) {
+                return;
+            }
             if (turnOffHotKeyAtom != 0) {
                 UnregisterHotKey(this.Handle, turnOffHotKeyAtom);
                 GlobalDeleteAtom(turnOffHotKeyAtom);
