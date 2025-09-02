@@ -36,6 +36,7 @@ namespace TurnDownTheLights {
         private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
         private Point? startPos = null;
         private bool IsActivated = false; // Custom flag to indicate active blackout
+        private bool IsSettingsOpen = false;
 
         private NotifyIcon notifyIcon;
         private ContextMenuStrip trayContextMenu;
@@ -44,15 +45,15 @@ namespace TurnDownTheLights {
             // AppSettings now handles its own initialization (loading settings or defaults) in its static constructor.
             // No explicit call to UpgradeSettingsIfRequired or SetDefaultsIfEmpty is needed here.
 
-            InitializeCursorPosition();
             Application.ApplicationExit += new EventHandler(OnApplicationExit); // For unregistering hotkeys
-            this.Load += new EventHandler(MainForm_Load); // For registering hotkeys & setting up tray
+            Load += new EventHandler(MainForm_Load); // For registering hotkeys & setting up tray
             InitializeComponent();
 
             // Setup for background running with NotifyIcon
-            this.WindowState = FormWindowState.Minimized;
-            this.ShowInTaskbar = false;
-            this.Visible = false; // Hide the form itself initially
+            WindowState = FormWindowState.Minimized;
+            ShowInTaskbar = false;
+            Visible = false; // Hide the form itself initially
+            MouseMove += TraceMouseMovement;
             InitializeTrayIcon();
         }
 
@@ -72,9 +73,10 @@ namespace TurnDownTheLights {
             exitMenuItem.Click += ExitMenuItem_Click;
             trayContextMenu.Items.Add(exitMenuItem);
 
-            notifyIcon = new NotifyIcon();
-            notifyIcon.ContextMenuStrip = trayContextMenu;
-            notifyIcon.Text = "TurnDownTheLights";
+            notifyIcon = new NotifyIcon {
+                ContextMenuStrip = trayContextMenu,
+                Text = "TurnDownTheLights"
+            };
             // Icon: Placeholder - ideally load from resources.
             // Using a system icon for now. This might not be ideal or might not work on all systems.
             // A proper .ico file should be added to the project resources.
@@ -118,7 +120,7 @@ namespace TurnDownTheLights {
                 uint modifiers = GetModifiers(turnOffKey);
                 uint vk = (uint)(turnOffKey & Keys.KeyCode);
                 turnOffHotKeyAtom = GlobalAddAtom("TurnOffHotKey_" + Guid.NewGuid().ToString());
-                if (!RegisterHotKey(this.Handle, turnOffHotKeyAtom, modifiers, vk)) {
+                if (!RegisterHotKey(Handle, turnOffHotKeyAtom, modifiers, vk)) {
                     Console.WriteLine($"Failed to register Turn Off hotkey. Error code: {Marshal.GetLastWin32Error()}");
                 } else {
                     Console.WriteLine($"Turn Off Hotkey registered: {turnOffKey}");
@@ -129,7 +131,7 @@ namespace TurnDownTheLights {
                 uint modifiers = GetModifiers(exitKey);
                 uint vk = (uint)(exitKey & Keys.KeyCode);
                 exitHotKeyAtom = GlobalAddAtom("ExitHotKey_" + Guid.NewGuid().ToString());
-                if (!RegisterHotKey(this.Handle, exitHotKeyAtom, modifiers, vk)) {
+                if (!RegisterHotKey(Handle, exitHotKeyAtom, modifiers, vk)) {
                     Console.WriteLine($"Failed to register Exit hotkey. Error code: {Marshal.GetLastWin32Error()}");
                 } else {
                     Console.WriteLine($"Exit Hotkey registered: {exitKey}");
@@ -138,17 +140,17 @@ namespace TurnDownTheLights {
         }
 
         private void UnregisterHotKeys() {
-            if (this.IsDisposed || !this.IsHandleCreated) {
+            if (IsDisposed || !IsHandleCreated) {
                 return;
             }
             if (turnOffHotKeyAtom != 0) {
-                UnregisterHotKey(this.Handle, turnOffHotKeyAtom);
+                UnregisterHotKey(Handle, turnOffHotKeyAtom);
                 GlobalDeleteAtom(turnOffHotKeyAtom);
                 turnOffHotKeyAtom = 0;
                 Console.WriteLine("Turn Off Hotkey unregistered.");
             }
             if (exitHotKeyAtom != 0) {
-                UnregisterHotKey(this.Handle, exitHotKeyAtom);
+                UnregisterHotKey(Handle, exitHotKeyAtom);
                 GlobalDeleteAtom(exitHotKeyAtom);
                 exitHotKeyAtom = 0;
                 Console.WriteLine("Exit Hotkey unregistered.");
@@ -167,13 +169,16 @@ namespace TurnDownTheLights {
         }
 
         protected override void WndProc(ref Message m) {
+            if (IsSettingsOpen) {
+                return;
+            }
             base.WndProc(ref m);
             if (m.Msg == WM_HOTKEY) {
                 int id = m.WParam.ToInt32();
                 if (id == turnOffHotKeyAtom) {
                     Console.WriteLine("Turn Off Hotkey Pressed!");
                     TriggerTurnOffActions();
-                } else if (id == exitHotKeyAtom && this.IsActivated) {
+                } else if (IsActivated && id == exitHotKeyAtom) {
                     Console.WriteLine("Exit Hotkey Pressed!");
                     TriggerTurnOnActions();
                 }
@@ -182,9 +187,10 @@ namespace TurnDownTheLights {
 
         private void TriggerTurnOffActions() {
             SetMonitorInState(MonitorState.MonitorStateOff);
+            InitializeCursorPosition();
 
             // Make the form cover secondary screens
-            this.Invoke((MethodInvoker)delegate {
+            Invoke((MethodInvoker)delegate {
                 Rectangle r = new Rectangle();
                 foreach (Screen s in Screen.AllScreens) {
                     if (s != Screen.PrimaryScreen) // Blackout only the secondary screens
@@ -192,18 +198,18 @@ namespace TurnDownTheLights {
                 }
 
                 if (!r.IsEmpty) {
-                    this.Top = r.Top;
-                    this.Left = r.Left;
-                    this.Width = r.Width;
-                    this.Height = r.Height;
-                    this.FormBorderStyle = FormBorderStyle.None; // Ensure no borders/title bar
-                    this.WindowState = FormWindowState.Normal; // Ensure it's not minimized
-                    this.BackColor = Color.Black; // Ensure it's black
-                    this.ShowInTaskbar = false; // Hide from taskbar when it's just a blackout screen
-                    this.TopMost = true; // Ensure it's on top
-                    this.Show(); // Show it if it was hidden
-                    this.Activate(); // Try to bring to front
-                    this.IsActivated = true;
+                    Top = r.Top;
+                    Left = r.Left;
+                    Width = r.Width;
+                    Height = r.Height;
+                    FormBorderStyle = FormBorderStyle.None; // Ensure no borders/title bar
+                    WindowState = FormWindowState.Normal; // Ensure it's not minimized
+                    BackColor = Color.Black; // Ensure it's black
+                    ShowInTaskbar = false; // Hide from taskbar when it's just a blackout screen
+                    TopMost = true; // Ensure it's on top
+                    Show(); // Show it if it was hidden
+                    Activate(); // Try to bring to front
+                    IsActivated = true;
                 } else {
                     // If no secondary screens, maybe just hide the form or do nothing extra
                     // For now, if no secondary screens, this part does nothing to the form's visibility/size
@@ -213,9 +219,9 @@ namespace TurnDownTheLights {
 
         private void TriggerTurnOnActions() {
             SetMonitorInState(MonitorState.MonitorStateOn);
-            this.Invoke((MethodInvoker)delegate {
-                this.Hide(); // Hide the blackout form
-                this.IsActivated = false;
+            Invoke((MethodInvoker)delegate {
+                Hide(); // Hide the blackout form
+                IsActivated = false;
             });
         }
 
@@ -225,16 +231,17 @@ namespace TurnDownTheLights {
             // Ensure the settings form is not parented to the main form if main form is invisible,
             // otherwise the dialog might also be invisible or behave strangely.
             // ShowDialog() without a parent is generally safer for tray apps.
-            UnregisterHotKeys();
+            IsSettingsOpen = true;
             using (var settingsForm = new SettingsForm(AppSettings.TurnOffHotKey, AppSettings.ExitHotKey)) {
-                if (settingsForm.ShowDialog() == DialogResult.OK) {
+                if (settingsForm.ShowDialog() == DialogResult.OK) { 
                     AppSettings.TurnOffHotKey = settingsForm.TurnOffHotKey;
                     AppSettings.ExitHotKey = settingsForm.ExitHotKey;
                     AppSettings.Save();
-                    MessageBox.Show("Settings saved. Hotkeys are now active.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    RegisterHotKeys(); // Re-register hotkeys immediately after saving
+                    //MessageBox.Show("Settings saved. Hotkeys are now active.", "Settings Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            RegisterHotKeys();
+            IsSettingsOpen = false;
         }
 
         private void OnApplicationExit(object sender, EventArgs e) {
@@ -259,6 +266,20 @@ namespace TurnDownTheLights {
 
         private void SetMonitorInState(MonitorState state) {
             SendMessage(0xFFFF, 0x112, 0xF170, (int)state);
+        }
+
+        private void TraceMouseMovement(object sender, MouseEventArgs e) {
+            Console.WriteLine($"Mouse moved: X={e.X}, Y={e.Y}");
+            if (IsActivated) {
+                SetMonitorInState(MonitorState.MonitorStateOff);
+                // Move cursor to the center of the primary screen
+                Rectangle r = Screen.PrimaryScreen.Bounds;
+                Cursor.Position = new Point(r.Left + r.Width / 2, r.Top + r.Height / 2);
+            }
+        }
+
+        private void MainForm_MouseMove(object sender, MouseEventArgs e) {
+            TraceMouseMovement(sender, e);
         }
     }
 

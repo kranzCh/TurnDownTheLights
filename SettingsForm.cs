@@ -8,7 +8,7 @@ namespace TurnDownTheLights {
 
         public SettingsForm(Keys currentTurnOffHotKey, Keys currentExitHotKey) {
             InitializeComponent();
-            this.StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterScreen;
             TurnOffHotKey = currentTurnOffHotKey;
             ExitHotKey = currentExitHotKey;
 
@@ -36,7 +36,7 @@ namespace TurnDownTheLights {
             return new KeysConverter().ConvertToString(keys);
         }
 
-        private void btnSave_Click(object sender, EventArgs e) {
+        private void BtnSave_Click(object sender, EventArgs e) {
             if (TurnOffHotKey == Keys.None || ExitHotKey == Keys.None) {
                 MessageBox.Show("Please define both shortcut keys.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -45,13 +45,13 @@ namespace TurnDownTheLights {
                 MessageBox.Show("Shortcut keys must be different.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            //this.DialogResult = DialogResult.OK;
-            this.Close();
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e) {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+        private void BtnCancel_Click(object sender, EventArgs e) {
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
         // Designer code will be added in the next step
